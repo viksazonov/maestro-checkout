@@ -1,0 +1,116 @@
+appId: com.ventrata.maestro_booking_demo
+name: datetime_dependencies
+tags:
+  - edge
+# Rules between the products on the Date & time page:
+#   1. Hop-on Hop-off is locked until Madame Tussauds has a time
+#   2. Hop-on slots start 2 hours after the Madame Tussauds time
+#   3. re-confirming Madame Tussauds clears the Hop-on choice
+#   4. changing the first product's date clears every other product
+---
+- runFlow: helpers/to_datetime_one_adult.yaml
+- tapOn:
+    id: Debug_SetForceOpenButton
+    retryTapIfNoChange: false
+- runFlow: helpers/pick_first_date.yaml
+
+# --- 1. Hop-on locked without a Madame Tussauds time -------------------
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product2_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product2_SelectButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Timeslot_Dialog
+
+# --- 2. Madame at 14:00 -> Hop-on starts at 16:00 ----------------------
+- runFlow:
+    file: helpers/pick_timeslot.yaml
+    env:
+      PRODUCT: 1
+      SLOT: Timeslot_Slot_14_00
+- tapOn:
+    id: DateTime_Product2_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Timeslot_Dialog
+- assertNotVisible:
+    id: Timeslot_Slot_15_00
+- assertVisible:
+    id: Timeslot_Slot_16_00
+- assertVisible:
+    id: Timeslot_Slot_18_00
+- tapOn:
+    id: Timeslot_Slot_16_00
+    retryTapIfNoChange: false
+- tapOn:
+    id: Timeslot_SaveButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: DateTime_Product2_ConfirmedDate
+
+# --- 3. Re-confirm Madame -> Hop-on choice is cleared ------------------
+- runFlow:
+    file: helpers/pick_timeslot.yaml
+    env:
+      PRODUCT: 1
+      SLOT: Timeslot_Slot_10_00
+- assertNotVisible:
+    id: DateTime_Product2_ConfirmedDate
+
+# --- 4. New date for the first product -> everything else is cleared --
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product3_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product3_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: DateTime_Product3_ConfirmedDate
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product0_SelectButton
+    direction: UP
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product0_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Calendar_Dialog
+# Any other selectable day will do: the 15th of next month always exists
+# and is inside the booking window.
+- tapOn:
+    id: Calendar_NextMonthButton
+    retryTapIfNoChange: false
+- tapOn:
+    id: Calendar_Day15
+    retryTapIfNoChange: false
+- tapOn:
+    id: Calendar_SaveButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: DateTime_Product0_ConfirmedDate
+- assertNotVisible:
+    id: DateTime_Product1_ConfirmedDate
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product3_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertNotVisible:
+    id: DateTime_Product3_ConfirmedDate
+# Required products are unconfirmed again -> Continue is blocked.
+- runFlow:
+    file: helpers/assert_blocked.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      PAGE: DateTime_Page

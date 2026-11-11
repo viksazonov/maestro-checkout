@@ -1,0 +1,23 @@
+appId: com.ventrata.maestro_booking_demo
+# Fresh app -> Checkout with 1 adult (33.00 EUR incl. 10 % fee).
+# Shared setup for the edge-case flows that start on Checkout.
+---
+- runFlow: to_datetime_one_adult.yaml
+- runFlow: quick_dates.yaml
+- runFlow:
+    file: continue_and_wait.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      NEXT_PAGE: Questions_Page
+- runFlow:
+    file: fill_questions.yaml
+    env:
+      TOTAL: 1
+- runFlow:
+    file: continue_and_wait.yaml
+    env:
+      BUTTON: Questions_ContinueButton
+      NEXT_PAGE: Checkout_Page
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*33\\.00 €.*"

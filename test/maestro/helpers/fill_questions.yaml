@@ -1,0 +1,59 @@
+appId: com.ventrata.maestro_booking_demo
+# Questions page: first proves that validation blocks an empty form, then
+# fills ONLY the required fields.
+#
+# Required (lib/screens/questions_screen.dart):
+#   - "How will you be arriving?" text area
+#   - "How did you hear about us?" dropdown
+#   - one "I confirm" checkbox per ticket (adults first, then children)
+#
+# env:
+#   TOTAL number of tickets = number of per-ticket checkboxes
+---
+# --- Negative: empty form must not pass -------------------------------
+- tapOn:
+    id: Questions_ContinueButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Questions_ValidationError
+    text: ${output.t.required}
+- assertNotVisible:
+    id: Loading_Overlay
+- assertVisible:
+    id: Questions_Page
+
+# --- Fill required fields only ------------------------------------------
+- tapOn:
+    id: Questions_BookingTextArea
+    retryTapIfNoChange: false
+- inputText: "Metrem"
+- hideKeyboard
+
+# The dropdown options have no semantic ids (see FINDINGS.md, testability),
+# so this is the one place where the test matches visible text - in the
+# language the suite runs in (strings.js).
+- tapOn:
+    id: Questions_BookingSelect
+    retryTapIfNoChange: false
+- tapOn:
+    text: ${output.t.socialMedia}
+    retryTapIfNoChange: false
+
+# One confirmation checkbox per ticket. The page is a lazy ListView, so an
+# item has to be scrolled into view before it exists in the accessibility
+# tree.
+- evalScript: ${output.i = 0}
+- repeat:
+    while:
+      true: ${output.i < TOTAL}
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: Questions_PerTicketCheckbox_${output.i}
+          direction: DOWN
+          visibilityPercentage: 50
+          timeout: 60000
+      - tapOn:
+          id: Questions_PerTicketCheckbox_${output.i}
+          retryTapIfNoChange: false
+      - evalScript: ${output.i = output.i + 1}

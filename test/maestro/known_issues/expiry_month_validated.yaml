@@ -1,0 +1,36 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #11: card expiry month 22 accepted"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+- runFlow:
+    file: ../helpers/fill_checkout.yaml
+    env:
+      PRICE_RE: "33\\.00"
+- tapOn:
+    id: Checkout_PayOrConfirmButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Payment_Page
+- tapOn:
+    id: Payment_CardNumberField
+    retryTapIfNoChange: false
+- inputText: "4242424242424242"
+- hideKeyboard
+- tapOn:
+    id: Payment_ExpiryField
+    retryTapIfNoChange: false
+- inputText: "2222"
+- hideKeyboard
+- tapOn:
+    id: Payment_CvcField
+    retryTapIfNoChange: false
+- inputText: "123"
+- hideKeyboard
+- tapOn:
+    id: Payment_PayButton
+    retryTapIfNoChange: false
+# Month 22 doesn't exist: the form should stop here.
+- assertVisible:
+    id: Payment_ExpiryError

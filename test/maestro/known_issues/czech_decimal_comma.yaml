@@ -1,0 +1,11 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #23: prices not localised (Czech decimal comma)"
+tags:
+  - known-issue
+---
+# Note: to_checkout_one_adult.yaml itself checks today's "33.00 €" on the
+# way; it has to switch to the comma together with this fix.
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*33,00 €.*"

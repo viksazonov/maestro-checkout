@@ -1,0 +1,72 @@
+appId: com.ventrata.maestro_booking_demo
+# Checkout page: checks the total and fills the required contact fields.
+# City is optional and is left empty on purpose.
+#
+# env:
+#   PRICE_RE expected total as a regex-safe string, e.g. 49\.50
+---
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*${PRICE_RE} €.*"
+
+# --- Negative: empty contact form must not reach Payment ---------------
+- tapOn:
+    id: Checkout_PayOrConfirmButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Checkout_FirstNameError
+- assertVisible:
+    id: Checkout_LastNameError
+- assertVisible:
+    id: Checkout_Page
+- assertNotVisible:
+    id: Payment_Page
+
+- tapOn:
+    id: Checkout_FirstNameField
+    retryTapIfNoChange: false
+- inputText: "Viktor"
+- hideKeyboard
+- tapOn:
+    id: Checkout_LastNameField
+    retryTapIfNoChange: false
+- inputText: "Tester"
+- hideKeyboard
+
+# Country options DO have ids (unlike the dropdown on the Questions page).
+- tapOn:
+    id: Checkout_CountryField
+    retryTapIfNoChange: false
+- tapOn:
+    id: Checkout_CountryOption_cz
+    retryTapIfNoChange: false
+
+- tapOn:
+    id: Checkout_StateProvinceField
+    retryTapIfNoChange: false
+# ASCII on purpose: Maestro types non-ASCII characters through a helper
+# keyboard that needs WRITE_SECURE_SETTINGS, which OnePlus/OxygenOS blocks
+# ("Jihomoravský" failed on a OnePlus 7T Pro).
+- inputText: "South Moravia"
+- hideKeyboard
+
+- scrollUntilVisible:
+    element:
+      id: Checkout_BookingTermsCheckbox
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Checkout_BookingTermsCheckbox
+    retryTapIfNoChange: false
+- scrollUntilVisible:
+    element:
+      id: Checkout_CancellationTermsCheckbox
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Checkout_CancellationTermsCheckbox
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Checkout_FirstNameError

@@ -1,0 +1,17 @@
+appId: com.ventrata.maestro_booking_demo
+# Taps a "next step" button that should be disabled and checks that nothing
+# happened: no loading overlay, still on the same page. Checking the
+# behaviour rather than an "enabled" flag works however Flutter reports the
+# button's state.
+#
+# env:
+#   BUTTON id of the button that should do nothing
+#   PAGE   id of the page we must still be on
+---
+- tapOn:
+    id: ${BUTTON}
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Loading_Overlay
+- assertVisible:
+    id: ${PAGE}

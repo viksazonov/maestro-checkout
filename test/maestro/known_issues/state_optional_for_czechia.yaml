@@ -1,0 +1,45 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #8: State/Province required for Czechia"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+- tapOn:
+    id: Checkout_FirstNameField
+    retryTapIfNoChange: false
+- inputText: "Viktor"
+- hideKeyboard
+- tapOn:
+    id: Checkout_LastNameField
+    retryTapIfNoChange: false
+- inputText: "Tester"
+- hideKeyboard
+- tapOn:
+    id: Checkout_CityField
+    retryTapIfNoChange: false
+- inputText: "Brno"
+- hideKeyboard
+- tapOn:
+    id: Checkout_CountryField
+    retryTapIfNoChange: false
+- tapOn:
+    id: Checkout_CountryOption_cz
+    retryTapIfNoChange: false
+- scrollUntilVisible:
+    element:
+      id: Checkout_CancellationTermsCheckbox
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Checkout_BookingTermsCheckbox
+    retryTapIfNoChange: false
+- tapOn:
+    id: Checkout_CancellationTermsCheckbox
+    retryTapIfNoChange: false
+# City filled, State/Province empty: a Czech address is complete.
+- tapOn:
+    id: Checkout_PayOrConfirmButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Payment_Page

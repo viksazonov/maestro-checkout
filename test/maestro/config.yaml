@@ -1,0 +1,13 @@
+# Maestro workspace config.
+# Maestro runs every flow in the top level of this folder; sub-flows live in
+# helpers/ and are therefore never run on their own.
+executionOrder:
+  continueOnFailure: true
+  flowsOrder:
+    - purchase_flow
+    - promo_code_rules
+    - datetime_dependencies
+    - timeslots_closed
+    - max_tickets_cap
+    - child_without_adult
+    - double_tap_continue

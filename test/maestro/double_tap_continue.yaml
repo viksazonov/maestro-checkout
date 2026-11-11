@@ -1,0 +1,29 @@
+appId: com.ventrata.maestro_booking_demo
+name: double_tap_continue
+tags:
+  - edge
+# Continue shows a 3-8 s loading overlay. A customer who taps it twice must
+# still get exactly one Date & time page (the app has an in-flight guard in
+# lib/utils/simulated_latency.dart). If two pages were pushed, one back
+# press would land on the second Date & time page instead of Tickets.
+---
+- runFlow: helpers/fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- tapOn:
+    id: Tickets_AdultIncrementButton
+    retryTapIfNoChange: false
+- doubleTapOn:
+    id: Tickets_ContinueButton
+- extendedWaitUntil:
+    visible:
+      id: DateTime_Page
+    timeout: 15000
+- assertNotVisible:
+    id: Loading_Overlay
+- back
+- assertVisible:
+    id: Tickets_Page
+- assertNotVisible:
+    id: DateTime_Page

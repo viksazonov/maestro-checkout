@@ -1,0 +1,12 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #3: no e-mail field on Checkout"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+- scrollUntilVisible:
+    element:
+      text: ".*[Ee]-?mail.*"
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 15000   # expected to fail today - no need to scroll for a minute

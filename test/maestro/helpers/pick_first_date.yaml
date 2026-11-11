@@ -1,0 +1,17 @@
+appId: com.ventrata.maestro_booking_demo
+# Opens the calendar for the first product and confirms the preselected
+# date (today). Tapping a specific day would break around month ends and
+# the test does not care which day is booked, only that one is confirmed.
+---
+- tapOn:
+    id: DateTime_Product0_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Calendar_Dialog
+- tapOn:
+    id: Calendar_SaveButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Calendar_Dialog
+- assertVisible:
+    id: DateTime_Product0_ConfirmedDate

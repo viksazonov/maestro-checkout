@@ -1,0 +1,16 @@
+appId: com.ventrata.maestro_booking_demo
+# Fresh app -> Date & time page with 1 adult ticket.
+# Shared setup for the flows that start on Date & time.
+---
+- runFlow: fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- tapOn:
+    id: Tickets_AdultIncrementButton
+    retryTapIfNoChange: false
+- runFlow:
+    file: continue_and_wait.yaml
+    env:
+      BUTTON: Tickets_ContinueButton
+      NEXT_PAGE: DateTime_Page

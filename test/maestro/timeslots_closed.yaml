@@ -1,0 +1,39 @@
+appId: com.ventrata.maestro_booking_demo
+name: timeslots_closed
+tags:
+  - edge
+# Edge case: Madame Tussauds has no time slots left for the chosen day
+# (the real app closes them after 15:00 for same-day bookings). The
+# dialog must say so, nothing may get confirmed, and Continue must stay
+# blocked because a required product is missing.
+---
+- runFlow: helpers/to_datetime_one_adult.yaml
+
+# Force the "closed" scenario via the app's test hook.
+- tapOn:
+    id: Debug_SetForceClosedButton
+    retryTapIfNoChange: false
+- runFlow: helpers/pick_first_date.yaml
+
+- tapOn:
+    id: DateTime_Product1_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Timeslot_Dialog
+- assertVisible:
+    id: Timeslot_ClosedMessage
+    text: ${output.t.closed}
+- assertNotVisible:
+    id: Timeslot_SaveButton
+- back
+- assertNotVisible:
+    id: Timeslot_Dialog
+- assertNotVisible:
+    id: DateTime_Product1_ConfirmedDate
+
+# A required product is unconfirmed -> cannot continue.
+- runFlow:
+    file: helpers/assert_blocked.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      PAGE: DateTime_Page

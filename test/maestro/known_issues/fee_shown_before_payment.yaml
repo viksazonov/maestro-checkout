@@ -1,0 +1,13 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #6: booking fee not shown before paying"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+# 1 adult = 30.00 + 3.00 fee; the fee should be visible on Checkout.
+- scrollUntilVisible:
+    element:
+      text: ".*(Poplatek|poplatek).*3\\.00.*"
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 15000   # expected to fail today - no need to scroll for a minute

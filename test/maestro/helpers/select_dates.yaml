@@ -1,0 +1,97 @@
+appId: com.ventrata.maestro_booking_demo
+# Date & time page.
+#
+# Product order in the package (lib/models/booking_state.dart):
+#   0 Empire State Building      required, calendar only on this one
+#   1 Madame Tussauds            required, hourly time slots
+#   2 Hop-on Hop-off             OPTIONAL, slots depend on product 1
+#   3 Statue of Liberty ferry    required, date only (no time slots)
+#
+# Flow: check that only product 0 is unlocked, confirm 0 and 1, use "Reset
+# selection" and prove it cleared both, then confirm 0, 1 and 3 for real. Product 2 is optional and stays empty,
+# which is exactly what the assignment says must still let you continue.
+---
+# Nothing confirmed yet -> Continue must be disabled.
+- runFlow:
+    file: assert_blocked.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      PAGE: DateTime_Page
+
+# Only the first product is unlocked: the others do nothing when tapped.
+- tapOn:
+    id: DateTime_Product1_SelectButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Timeslot_Dialog
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product3_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product3_SelectButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: DateTime_Product3_ConfirmedDate
+- scrollUntilVisible:
+    element:
+      id: Debug_SetForceOpenButton
+    direction: UP
+    visibilityPercentage: 50
+    timeout: 60000
+
+# The app hides Madame Tussauds' time slots when the chosen date is today
+# and the local time is past 15:00. The app ships a test-only hook (an
+# invisible 12x12 tap target, see DebugIds in lib/ids/booking_ids.dart)
+# that forces slots open, so this flow passes at any time of day.
+- tapOn:
+    id: Debug_SetForceOpenButton
+    retryTapIfNoChange: false
+
+- runFlow: pick_first_date.yaml
+- runFlow:
+    file: pick_timeslot.yaml
+    env:
+      PRODUCT: 1
+      SLOT: Timeslot_Slot_10_00
+
+# --- Reset selection must wipe what we just confirmed -------------------
+- tapOn:
+    id: DateTime_ResetSelectionLink
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: DateTime_Product0_ConfirmedDate
+- assertNotVisible:
+    id: DateTime_Product1_ConfirmedDate
+- assertNotVisible:
+    id: DateTime_ResetSelectionLink
+- runFlow:
+    file: assert_blocked.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      PAGE: DateTime_Page
+
+# --- Real selection ----------------------------------------------------
+- runFlow: pick_first_date.yaml
+- runFlow:
+    file: pick_timeslot.yaml
+    env:
+      PRODUCT: 1
+      SLOT: Timeslot_Slot_10_00
+# Statue of Liberty has no time slots: one tap confirms the locked date.
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product3_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product3_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: DateTime_Product3_ConfirmedDate
+# Optional product 2 intentionally left unselected.
+- assertNotVisible:
+    id: DateTime_Product2_ConfirmedDate

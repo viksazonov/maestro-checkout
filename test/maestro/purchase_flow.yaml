@@ -1,0 +1,77 @@
+appId: com.ventrata.maestro_booking_demo
+name: purchase_flow
+tags:
+  - e2e
+# End-to-end purchase of the "NYC Icons Express" package:
+#   Home -> Tickets -> Date & time -> Questions -> Checkout -> Payment
+#   -> (declined) -> promo code -> Checkout -> Success
+#
+# Ticket quantities are random on every run (helpers/random_tickets.js);
+# the expected total is computed from them and checked on Checkout and
+# Success. Each step lives in its own sub-flow under helpers/.
+---
+- runFlow: helpers/fresh_launch.yaml
+- assertVisible:
+    id: Home_Page
+
+- runScript: helpers/random_tickets.js
+
+# 1. Package
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_Page
+
+# 2. Tickets (includes the child-needs-adult rule check)
+- runFlow:
+    file: helpers/select_tickets.yaml
+    env:
+      ADULT: ${output.adult}
+      CHILD: ${output.child}
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: Tickets_ContinueButton
+      NEXT_PAGE: DateTime_Page
+
+# 3. Date & time (includes "Reset selection")
+- runFlow: helpers/select_dates.yaml
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: DateTime_ContinueButton
+      NEXT_PAGE: Questions_Page
+
+# 4. Questions (includes the empty-form validation check)
+- runFlow:
+    file: helpers/fill_questions.yaml
+    env:
+      TOTAL: ${output.total}
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: Questions_ContinueButton
+      NEXT_PAGE: Checkout_Page
+
+# 5. Checkout + payment
+- runFlow:
+    file: helpers/fill_checkout.yaml
+    env:
+      PRICE_RE: ${output.priceRe}
+- runFlow: helpers/pay_by_card_declined.yaml
+- runFlow:
+    file: helpers/apply_promo_and_confirm.yaml
+    env:
+      PRICE_RE: ${output.priceRe}
+
+# 6. Success
+- runFlow:
+    file: helpers/verify_success.yaml
+    env:
+      ADULT: ${output.adult}
+      CHILD: ${output.child}
+      PRICE_RE: ${output.priceRe}
+      ADULT_LINE_RE: ${output.adultLineRe}
+      CHILD_LINE_RE: ${output.childLineRe}
+      FEE_RE: ${output.feeRe}

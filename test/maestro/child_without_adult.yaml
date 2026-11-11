@@ -1,0 +1,55 @@
+appId: com.ventrata.maestro_booking_demo
+name: child_without_adult
+tags:
+  - edge
+# The child-needs-adult rule must also hold when the adult is removed after
+# the child was added - not only when a child is added first. Also checks
+# that counts can't go below zero.
+---
+- runFlow: helpers/fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- tapOn:
+    id: Tickets_AdultIncrementButton
+    retryTapIfNoChange: false
+- tapOn:
+    id: Tickets_ChildIncrementButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Tickets_ChildRequiresAdultError
+
+# Remove the adult -> the child is alone again.
+- tapOn:
+    id: Tickets_AdultDecrementButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "0"
+- assertVisible:
+    id: Tickets_ChildRequiresAdultError
+- runFlow:
+    file: helpers/assert_blocked.yaml
+    env:
+      BUTTON: Tickets_ContinueButton
+      PAGE: Tickets_Page
+
+# Minus at zero stays at zero.
+- tapOn:
+    id: Tickets_AdultDecrementButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "0"
+
+# Adding the adult back unblocks the purchase.
+- tapOn:
+    id: Tickets_AdultIncrementButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Tickets_ChildRequiresAdultError
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: Tickets_ContinueButton
+      NEXT_PAGE: DateTime_Page

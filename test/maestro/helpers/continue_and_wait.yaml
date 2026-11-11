@@ -1,0 +1,20 @@
+appId: com.ventrata.maestro_booking_demo
+# Taps a "next step" button and waits for the next page.
+# Every Continue / Pay / Confirm in this app shows a loading overlay for a
+# random 3-8 seconds (see lib/utils/simulated_latency.dart), so a fixed
+# sleep would be either slow or flaky. Waiting for the next page id is both
+# faster and deterministic.
+#
+# env:
+#   BUTTON    id of the button to tap
+#   NEXT_PAGE id of the page that must appear afterwards
+---
+- tapOn:
+    id: ${BUTTON}
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible:
+      id: ${NEXT_PAGE}
+    timeout: 15000
+- assertNotVisible:
+    id: Loading_Overlay

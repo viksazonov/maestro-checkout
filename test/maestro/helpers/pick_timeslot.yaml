@@ -1,0 +1,24 @@
+appId: com.ventrata.maestro_booking_demo
+# Opens the time slot dialog for one product and picks a slot.
+#
+# env:
+#   PRODUCT product index (1 = Madame Tussauds, 2 = Hop-on Hop-off)
+#   SLOT    slot id, e.g. Timeslot_Slot_10_00
+---
+- tapOn:
+    id: DateTime_Product${PRODUCT}_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Timeslot_Dialog
+- assertVisible:
+    id: Timeslot_LockedDateText
+- tapOn:
+    id: ${SLOT}
+    retryTapIfNoChange: false
+- tapOn:
+    id: Timeslot_SaveButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Timeslot_Dialog
+- assertVisible:
+    id: DateTime_Product${PRODUCT}_ConfirmedDate

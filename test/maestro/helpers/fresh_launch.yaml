@@ -1,0 +1,45 @@
+appId: com.ventrata.maestro_booking_demo
+# Starts the app from a clean state, in the language the suite runs in.
+#
+# clearState wipes the app's data. Some OnePlus / OxygenOS builds refuse
+# that (`pm clear` -> SecurityException) unless Developer options ->
+# "Disable permission monitoring" is on; on such a phone run the suite with
+# `-e CLEAR_STATE=false`. The app keeps all booking state in memory (no
+# storage, see pubspec.yaml), so a killed and relaunched app is still a
+# clean start.
+#
+# The app always starts in Czech; with `-e APP_LANG=en` the language toggle
+# on Home is tapped and the English Home screen is checked (strings.js).
+---
+- runScript: strings.js
+- runFlow:
+    when:
+      true: ${typeof CLEAR_STATE === 'undefined' || CLEAR_STATE != 'false'}
+    commands:
+      - clearState
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: Home_PackageButton
+    timeout: 15000
+# A tap right after launch can land before Flutter handles input, so tap
+# until the Home button really reads in the target language (max 3 taps).
+# Buttons carry their id on a wrapper and the label on the button inside,
+# so button labels are matched by text alone (they are unique per screen).
+- runFlow:
+    when:
+      true: ${output.lang == 'en'}
+    commands:
+      - repeat:
+          times: 3
+          while:
+            notVisible:
+              text: ${output.t.packageButton}
+          commands:
+            - tapOn:
+                id: Home_LanguageToggleButton
+                retryTapIfNoChange: false
+            - waitForAnimationToEnd
+      - assertVisible:
+          text: ${output.t.packageButton}

@@ -1,0 +1,89 @@
+appId: com.ventrata.maestro_booking_demo
+# Payment by card, starting on a filled-in Checkout.
+#
+# Card payment is ALWAYS declined in this build
+# (lib/screens/payment_screen.dart, see FINDINGS.md #4), so this helper
+# checks the card form's validation, pays with a valid-looking card, expects
+# the declined screen and returns to Checkout the way a customer would:
+# "Try again", then back.
+---
+- tapOn:
+    id: Checkout_PayOrConfirmButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Payment_Page
+# Negative: an empty card form shows a message under every card field.
+- tapOn:
+    id: Payment_PayButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Payment_CardNumberError
+- assertVisible:
+    id: Payment_ExpiryError
+- assertVisible:
+    id: Payment_CvcError
+# Too short values are rejected too.
+- tapOn:
+    id: Payment_CardNumberField
+    retryTapIfNoChange: false
+- inputText: "42424242"
+- hideKeyboard
+- tapOn:
+    id: Payment_CvcField
+    retryTapIfNoChange: false
+- inputText: "12"
+- hideKeyboard
+- tapOn:
+    id: Payment_PayButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Payment_CardNumberError
+- assertVisible:
+    id: Payment_CvcError
+- assertNotVisible:
+    id: PaymentResult_ProcessingPage
+# Now valid values (the formatter shows the card number in groups of 4).
+- tapOn:
+    id: Payment_CardNumberField
+    retryTapIfNoChange: false
+- eraseText: 30
+- inputText: "4242424242424242"
+- hideKeyboard
+- tapOn:
+    id: Payment_ExpiryField
+    retryTapIfNoChange: false
+- inputText: "1230"
+- hideKeyboard
+- tapOn:
+    id: Payment_CvcField
+    retryTapIfNoChange: false
+- eraseText: 5
+- inputText: "123"
+- hideKeyboard
+- assertNotVisible:
+    id: Payment_CardNumberError
+# Name on card is prefilled from the contact details.
+- tapOn:
+    id: Payment_PayButton
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible:
+      id: PaymentResult_DeclinedPage
+    timeout: 10000
+# The declined screen merges title, order code and message into one
+# accessibility node, so match the title as part of it.
+- assertVisible:
+    text: ".*${output.t.declined}.*"
+- tapOn:
+    id: PaymentResult_RetryButton
+    retryTapIfNoChange: false
+# "Try again" only pops the result screen, so we land back on Payment,
+# and need back (see back_until_gone.yaml for why it can take two).
+- assertVisible:
+    id: Payment_Page
+- runFlow:
+    file: back_until_gone.yaml
+    env:
+      PAGE: Payment_Page
+- assertVisible:
+    id: Checkout_Page

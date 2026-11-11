@@ -1,0 +1,36 @@
+appId: com.ventrata.maestro_booking_demo
+name: max_tickets_cap
+tags:
+  - edge
+# Edge case: the combined ticket limit is 20. Extra taps on "+" must be
+# ignored for both ticket types once the limit is reached.
+---
+- runFlow: helpers/fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- repeat:
+    times: 18
+    commands:
+      - tapOn:
+          id: Tickets_AdultIncrementButton
+          retryTapIfNoChange: false
+- repeat:
+    times: 4
+    commands:
+      - tapOn:
+          id: Tickets_ChildIncrementButton
+          retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "18"
+- assertVisible:
+    id: Tickets_ChildCount
+    text: "2"
+# Limit reached - one more adult must also be ignored.
+- tapOn:
+    id: Tickets_AdultIncrementButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "18"

@@ -1,0 +1,10 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #22: Home shows Slovak copy in Czech"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/fresh_launch.yaml
+- assertVisible:
+    id: Home_PackageButton
+- assertVisible:
+    text: "Vybrat tento zájezd"

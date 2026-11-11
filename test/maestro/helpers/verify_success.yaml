@@ -1,0 +1,89 @@
+appId: com.ventrata.maestro_booking_demo
+# Success page: the order must contain exactly what was bought.
+#
+# env:
+#   ADULT    adults bought
+#   CHILD    children bought
+#   PRICE_RE      pre-discount total, regex-safe
+#   ADULT_LINE_RE adults x 30 EUR, regex-safe
+#   CHILD_LINE_RE children x 15 EUR, regex-safe
+#   FEE_RE        10 % booking fee, regex-safe
+---
+- assertVisible:
+    text: ".*${output.t.thankYou}.*"
+- assertVisible:
+    id: Success_FreeBadge
+# Order code: 8 characters from the app's alphabet (no 0/O/1/I, see
+# lib/utils/order_code.dart).
+- assertVisible:
+    text: ".*(Kód objednávky|Order code): [A-HJ-NP-Z2-9]{8}.*"
+
+# Ticket counts
+- assertVisible:
+    id: Success_UnitTypeRow_adult
+    text: "${ADULT} × .*"
+- runFlow:
+    when:
+      true: ${CHILD > 0}
+    commands:
+      - assertVisible:
+          id: Success_UnitTypeRow_child
+          text: "${CHILD} × .*"
+- runFlow:
+    when:
+      true: ${CHILD == 0}
+    commands:
+      - assertNotVisible:
+          id: Success_UnitTypeRow_child
+
+# Products: 0, 1 and 3 were booked, 2 (optional) was not.
+- scrollUntilVisible:
+    element:
+      id: Success_ProductSummary_1
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertVisible:
+    id: Success_ProductSummary_0
+- assertVisible:
+    id: Success_Product1_TimeField
+    text: "10:00"
+- scrollUntilVisible:
+    element:
+      id: Success_ProductSummary_3
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertNotVisible:
+    id: Success_ProductSummary_2
+
+# Money: per-type lines, booking fee, original price, the discount that
+# cancelled it, and 0.00 due.
+- scrollUntilVisible:
+    element:
+      id: Success_FinalTotal
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertVisible:
+    id: Success_UnitPriceRow_adult
+    text: ".*${ADULT} × 30\\.00 €.*${ADULT_LINE_RE} €.*"
+- runFlow:
+    when:
+      true: ${CHILD > 0}
+    commands:
+      - assertVisible:
+          id: Success_UnitPriceRow_child
+          text: ".*${CHILD} × 15\\.00 €.*${CHILD_LINE_RE} €.*"
+- assertVisible:
+    id: Success_BookingFeeRow
+    text: ".*${FEE_RE} €.*"
+- assertVisible:
+    id: Success_OriginalPriceRow
+    text: ".*${PRICE_RE} €.*"
+- assertVisible:
+    id: Success_DiscountRow
+    text: ".*-${PRICE_RE} €.*"
+- assertVisible:
+    id: Success_FinalTotal
+    text: ".*0\\.00 €.*"

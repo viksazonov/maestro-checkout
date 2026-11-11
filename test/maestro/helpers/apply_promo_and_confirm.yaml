@@ -1,0 +1,68 @@
+appId: com.ventrata.maestro_booking_demo
+# The only way to a completed order in this build: the promo code.
+#
+# Starting on Checkout: the "Enter promo code" button only shows a toast,
+# but it unlocks a promo field one step back on Questions. Enter
+# MAESTROFREE there, continue to Checkout again (now free) and confirm.
+#
+# env:
+#   PRICE_RE expected total before the discount, regex-safe
+---
+# --- Unlock the promo field and apply the code --------------------------
+- scrollUntilVisible:
+    element:
+      id: Checkout_EnterPromoButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Checkout_EnterPromoButton
+    retryTapIfNoChange: false
+# The button only shows an "Error." toast - the field appears one step back.
+- runFlow:
+    file: back_until_gone.yaml
+    env:
+      PAGE: Checkout_Page
+- assertVisible:
+    id: Questions_Page
+- scrollUntilVisible:
+    element:
+      id: Questions_PromoCodeField
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Questions_PromoCodeField
+    retryTapIfNoChange: false
+- inputText: "MAESTROFREE"
+- hideKeyboard
+- runFlow:
+    file: continue_and_wait.yaml
+    env:
+      BUTTON: Questions_ContinueButton
+      NEXT_PAGE: Checkout_Page
+
+# --- Checkout again: discount applied, nothing left to pay --------------
+# The chip sits right below the total, often just off-screen.
+- scrollUntilVisible:
+    element:
+      id: Checkout_PromoAppliedChip
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertVisible:
+    id: Checkout_PromoAppliedChip
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*0\\.00 €.*"
+- assertNotVisible:
+    id: Checkout_PriceTotal
+    text: ".*${PRICE_RE} €.*"
+- assertVisible:
+    text: ${output.t.confirmOrder}
+# Contact details were kept from the first attempt, so Confirm goes through.
+- runFlow:
+    file: continue_and_wait.yaml
+    env:
+      BUTTON: Checkout_PayOrConfirmButton
+      NEXT_PAGE: Success_Page

@@ -1,0 +1,14 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #17: no age ranges for Adult / Child"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_Page
+# e.g. "Dítě (3–12 let)" - any age range next to the ticket types.
+- assertVisible:
+    text: ".*[0-9]+.*(let|roků|years).*"

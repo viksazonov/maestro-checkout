@@ -1,0 +1,90 @@
+appId: com.ventrata.maestro_booking_demo
+name: promo_code_rules
+tags:
+  - edge
+# Promo code behaviour, starting from Checkout with 1 adult (33.00 EUR):
+#   1. an unknown code gives no discount (and, see README, no message either)
+#   2. the valid code is accepted in lower case (input is normalised)
+#   3. removing the applied code restores the full price
+---
+- runFlow: helpers/to_checkout_one_adult.yaml
+
+# The promo field on Questions only appears after this button was tapped.
+- scrollUntilVisible:
+    element:
+      id: Checkout_EnterPromoButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Checkout_EnterPromoButton
+    retryTapIfNoChange: false
+- runFlow:
+    file: helpers/back_until_gone.yaml
+    env:
+      PAGE: Checkout_Page
+
+# --- 1. Unknown code -> no discount ------------------------------------
+- scrollUntilVisible:
+    element:
+      id: Questions_PromoCodeField
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Questions_PromoCodeField
+    retryTapIfNoChange: false
+- inputText: "WRONGCODE"
+- hideKeyboard
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: Questions_ContinueButton
+      NEXT_PAGE: Checkout_Page
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*33\\.00 €.*"
+- assertNotVisible:
+    id: Checkout_PromoAppliedChip
+
+# --- 2. Valid code in lower case -> order becomes free -----------------
+- runFlow:
+    file: helpers/back_until_gone.yaml
+    env:
+      PAGE: Checkout_Page
+- scrollUntilVisible:
+    element:
+      id: Questions_PromoCodeField
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: Questions_PromoCodeField
+    retryTapIfNoChange: false
+- eraseText: 20
+- inputText: "maestrofree"
+- hideKeyboard
+- runFlow:
+    file: helpers/continue_and_wait.yaml
+    env:
+      BUTTON: Questions_ContinueButton
+      NEXT_PAGE: Checkout_Page
+- scrollUntilVisible:
+    element:
+      id: Checkout_PromoAppliedChip
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*0\\.00 €.*"
+
+# --- 3. Remove the code -> full price is back --------------------------
+- tapOn:
+    id: Checkout_RemovePromoButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Checkout_PromoAppliedChip
+- assertVisible:
+    id: Checkout_PriceTotal
+    text: ".*33\\.00 €.*"

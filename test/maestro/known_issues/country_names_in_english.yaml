@@ -1,0 +1,14 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #25: country names stay Czech in English"
+tags:
+  - known-issue
+---
+- evalScript: ${output.forceLang = 'en'}
+- runFlow: ../helpers/to_checkout_one_adult.yaml
+- tapOn:
+    id: Checkout_CountryField
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Checkout_CountryOption_cz
+- assertVisible:
+    text: "(Czech Republic|Czechia)"

@@ -1,0 +1,63 @@
+appId: com.ventrata.maestro_booking_demo
+# Tickets page: verifies the "child needs an adult" rule, then picks the
+# requested quantities.
+#
+# env:
+#   ADULT number of adult tickets (>= 1)
+#   CHILD number of child tickets (>= 0)
+---
+# --- Rule check: a child ticket alone must be blocked -------------------
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "0"
+- tapOn:
+    id: Tickets_ChildIncrementButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_ChildRequiresAdultError
+    text: ${output.t.childNeedsAdult}
+# Continue is disabled in this state.
+- runFlow:
+    file: assert_blocked.yaml
+    env:
+      BUTTON: Tickets_ContinueButton
+      PAGE: Tickets_Page
+# Back to zero so the real selection starts from a clean count.
+- tapOn:
+    id: Tickets_ChildDecrementButton
+    retryTapIfNoChange: false
+- assertNotVisible:
+    id: Tickets_ChildRequiresAdultError
+# The button label is in the language the suite runs in.
+- assertVisible:
+    text: ${output.t.continueLabel}
+
+# --- Real selection ----------------------------------------------------
+# Counter-driven loops: the counts come from env, and a while-loop also
+# handles CHILD = 0 cleanly (zero iterations).
+- evalScript: ${output.n = 0}
+- repeat:
+    while:
+      true: ${output.n < ADULT}
+    commands:
+      - tapOn:
+          id: Tickets_AdultIncrementButton
+          retryTapIfNoChange: false
+      - evalScript: ${output.n = output.n + 1}
+- evalScript: ${output.n = 0}
+- repeat:
+    while:
+      true: ${output.n < CHILD}
+    commands:
+      - tapOn:
+          id: Tickets_ChildIncrementButton
+          retryTapIfNoChange: false
+      - evalScript: ${output.n = output.n + 1}
+- assertVisible:
+    id: Tickets_AdultCount
+    text: ${ADULT}
+- assertVisible:
+    id: Tickets_ChildCount
+    text: ${CHILD}
+- assertNotVisible:
+    id: Tickets_ChildRequiresAdultError

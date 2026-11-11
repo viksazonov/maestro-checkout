@@ -1,0 +1,25 @@
+appId: com.ventrata.maestro_booking_demo
+# Shortest valid Date & time selection, for flows that only need to get
+# past this page: today for the first product, 10:00 for Madame Tussauds,
+# the locked date for the ferry. The optional Hop-on Hop-off stays empty.
+---
+- tapOn:
+    id: Debug_SetForceOpenButton
+    retryTapIfNoChange: false
+- runFlow: pick_first_date.yaml
+- runFlow:
+    file: pick_timeslot.yaml
+    env:
+      PRODUCT: 1
+      SLOT: Timeslot_Slot_10_00
+- scrollUntilVisible:
+    element:
+      id: DateTime_Product3_SelectButton
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 60000
+- tapOn:
+    id: DateTime_Product3_SelectButton
+    retryTapIfNoChange: false
+- assertVisible:
+    id: DateTime_Product3_ConfirmedDate

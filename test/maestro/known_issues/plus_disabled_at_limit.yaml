@@ -1,0 +1,23 @@
+appId: com.ventrata.maestro_booking_demo
+name: "known issue #13: + stays active at the 20-ticket limit"
+tags:
+  - known-issue
+---
+- runFlow: ../helpers/fresh_launch.yaml
+- tapOn:
+    id: Home_PackageButton
+    retryTapIfNoChange: false
+- repeat:
+    times: 20
+    commands:
+      - tapOn:
+          id: Tickets_AdultIncrementButton
+          retryTapIfNoChange: false
+- assertVisible:
+    id: Tickets_AdultCount
+    text: "20"
+# The id sits on a wrapper; the button inside should be disabled.
+- assertVisible:
+    enabled: false
+    childOf:
+      id: Tickets_AdultIncrementButton

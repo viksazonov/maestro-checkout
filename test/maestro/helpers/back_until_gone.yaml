@@ -1,0 +1,16 @@
+appId: com.ventrata.maestro_booking_demo
+# Presses Android back until the given page is gone (max 3 presses).
+# Needed because Flutter restores focus to the last text field when a page
+# comes back into view, and the first back press then only closes the
+# keyboard instead of navigating.
+#
+# env:
+#   PAGE id of the page to leave
+---
+- repeat:
+    times: 3
+    while:
+      visible:
+        id: ${PAGE}
+    commands:
+      - back

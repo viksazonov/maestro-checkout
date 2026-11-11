@@ -74,3 +74,6 @@ web/**/flutter_service_worker.js
 
 # Claude Code local state (machine-specific permissions, not needed by others)
 .claude/
+
+# Maestro run output (see run_tests.sh)
+/reports/
