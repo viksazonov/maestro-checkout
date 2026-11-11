@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="ventrata_pixel" tests="7" failures="0" time="610.671" timestamp="2026-11-11T00:45:27">
+    <testcase id="purchase_flow" name="purchase_flow" classname="purchase_flow" file="test/maestro/purchase_flow.yaml" time="245.068" timestamp="2026-11-11T00:45:27" status="SUCCESS">
+      <properties>
+        <property name="tags" value="e2e"/>
+      </properties>
+    </testcase>
+    <testcase id="promo_code_rules" name="promo_code_rules" classname="promo_code_rules" file="test/maestro/promo_code_rules.yaml" time="130.335" timestamp="2026-11-11T00:49:33" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="datetime_dependencies" name="datetime_dependencies" classname="datetime_dependencies" file="test/maestro/datetime_dependencies.yaml" time="72.584" timestamp="2026-11-11T00:51:43" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="timeslots_closed" name="timeslots_closed" classname="timeslots_closed" file="test/maestro/timeslots_closed.yaml" time="36.138" timestamp="2026-11-11T00:52:55" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="max_tickets_cap" name="max_tickets_cap" classname="max_tickets_cap" file="test/maestro/max_tickets_cap.yaml" time="61.257" timestamp="2026-11-11T00:53:32" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="child_without_adult" name="child_without_adult" classname="child_without_adult" file="test/maestro/child_without_adult.yaml" time="39.129" timestamp="2026-11-11T00:54:33" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="double_tap_continue" name="double_tap_continue" classname="double_tap_continue" file="test/maestro/double_tap_continue.yaml" time="26.02" timestamp="2026-11-11T00:55:12" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

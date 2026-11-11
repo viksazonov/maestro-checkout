@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="d2183082" tests="7" failures="1" time="1193.341" timestamp="2026-11-11T00:30:16">
+    <testcase id="purchase_flow" name="purchase_flow" classname="purchase_flow" file="test/maestro/purchase_flow.yaml" time="385.725" timestamp="2026-11-11T00:30:16" status="ERROR">
+      <properties>
+        <property name="tags" value="e2e"/>
+      </properties>
+      <failure>No visible element found: id: Questions_PerTicketCheckbox_5</failure>
+    </testcase>
+    <testcase id="promo_code_rules" name="promo_code_rules" classname="promo_code_rules" file="test/maestro/promo_code_rules.yaml" time="304.709" timestamp="2026-11-11T00:36:42" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="datetime_dependencies" name="datetime_dependencies" classname="datetime_dependencies" file="test/maestro/datetime_dependencies.yaml" time="199.09" timestamp="2026-11-11T00:41:46" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="timeslots_closed" name="timeslots_closed" classname="timeslots_closed" file="test/maestro/timeslots_closed.yaml" time="63.97" timestamp="2026-11-11T00:45:05" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="max_tickets_cap" name="max_tickets_cap" classname="max_tickets_cap" file="test/maestro/max_tickets_cap.yaml" time="150.639" timestamp="2026-11-11T00:46:09" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="child_without_adult" name="child_without_adult" classname="child_without_adult" file="test/maestro/child_without_adult.yaml" time="69.138" timestamp="2026-11-11T00:48:40" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+    <testcase id="double_tap_continue" name="double_tap_continue" classname="double_tap_continue" file="test/maestro/double_tap_continue.yaml" time="19.901" timestamp="2026-11-11T00:49:49" status="SUCCESS">
+      <properties>
+        <property name="tags" value="edge"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>
